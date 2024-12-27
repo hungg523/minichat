@@ -3,10 +3,10 @@ using System.Text;
 
 class ChatClient
 {
-    private static int messageAreaHeight = 20; // Khu vực hiển thị tin nhắn
-    private static int inputAreaHeight = 3;    // Khu vực nhập liệu
+    private static int messageAreaHeight = 20;
+    private static int inputAreaHeight = 3;
     private static string clientName;
-    private static List<string> chatHistory = new List<string>(); // Lịch sử chat
+    private static List<string> chatHistory = new List<string>();
 
     static void Main()
     {
@@ -21,23 +21,20 @@ class ChatClient
         TcpClient client = new TcpClient("127.0.0.1", 8888);
         NetworkStream stream = client.GetStream();
 
-        // Gửi tên đến server
         byte[] nameData = Encoding.ASCII.GetBytes(clientName);
         stream.Write(nameData, 0, nameData.Length);
 
-        // Tạo một thread để nhận tin nhắn từ server
         Thread receiveThread = new Thread(() => ReceiveMessages(stream));
         receiveThread.Start();
 
         while (true)
         {
             Console.SetCursorPosition(1, messageAreaHeight + 2);
-            Console.Write(new string(' ', Console.WindowWidth - 2)); // Xóa dòng cũ
+            Console.Write(new string(' ', Console.WindowWidth - 2));
             Console.SetCursorPosition(1, messageAreaHeight + 2);
             Console.Write($"{clientName}: ");
             string message = Console.ReadLine();
 
-            // Gửi tin nhắn tới server
             byte[] data = Encoding.ASCII.GetBytes(message);
             stream.Write(data, 0, data.Length);
         }
@@ -45,7 +42,6 @@ class ChatClient
 
     static void DrawChatLayout()
     {
-        // Kẻ đường viền và khu vực chat
         Console.Clear();
         Console.SetCursorPosition(0, 0);
         Console.WriteLine(new string('=', Console.WindowWidth));
@@ -61,7 +57,6 @@ class ChatClient
         Console.SetCursorPosition(0, messageAreaHeight + 1);
         Console.WriteLine(new string('=', Console.WindowWidth));
 
-        // Khu vực nhập tin nhắn
         for (int i = messageAreaHeight + 2; i < messageAreaHeight + 2 + inputAreaHeight; i++)
         {
             Console.SetCursorPosition(0, i);
@@ -97,26 +92,19 @@ class ChatClient
 
     static void AddMessageToHistory(string message)
     {
-        // Thêm tin nhắn vào lịch sử chat
         chatHistory.Add(message);
-        if (chatHistory.Count > messageAreaHeight)
-        {
-            // Nếu vượt quá vùng hiển thị, xóa tin nhắn cũ nhất để cuộn lên
-            chatHistory.RemoveAt(0);
-        }
+        if (chatHistory.Count > messageAreaHeight) chatHistory.RemoveAt(0);
     }
 
     static void RedrawChatHistory()
     {
-        // Lưu vị trí con trỏ hiện tại
         int currentCursorLeft = Console.CursorLeft;
         int currentCursorTop = Console.CursorTop;
 
-        // Vẽ lại khu vực chat
         for (int i = 0; i < messageAreaHeight; i++)
         {
             Console.SetCursorPosition(1, i + 1);
-            Console.Write(new string(' ', Console.WindowWidth - 2)); // Xóa dòng cũ
+            Console.Write(new string(' ', Console.WindowWidth - 2));
             if (i < chatHistory.Count)
             {
                 Console.SetCursorPosition(1, i + 1);
@@ -124,7 +112,6 @@ class ChatClient
             }
         }
 
-        // Khôi phục vị trí con trỏ
         Console.SetCursorPosition(currentCursorLeft, currentCursorTop);
     }
 }
